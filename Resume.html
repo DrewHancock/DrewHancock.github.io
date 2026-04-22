@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andrew Hancock | Resume</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: #f4f7fb;
+            color: #212529;
+        }
+        .resume-hero {
+            position: relative;
+            min-height: 430px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #fff;
+        }
+        .resume-hero img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
+            filter: brightness(0.55);
+        }
+        .resume-hero .hero-overlay {
+            position: relative;
+            z-index: 2;
+            max-width: 880px;
+            padding: 24px;
+        }
+        .resume-hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.04em;
+        }
+        .resume-hero p.lead {
+            font-size: 1.15rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.92;
+        }
+        .resume-section {
+            padding: 3rem 0;
+        }
+        .resume-card {
+            background: #ffffff;
+            border: 1px solid rgba(33,37,41,.05);
+            border-radius: 1rem;
+            box-shadow: 0 20px 50px rgba(36, 59, 85, 0.08);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .resume-card h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: #1a4b6d;
+        }
+        .resume-list {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 0;
+        }
+        .resume-list li {
+            margin-bottom: 0.75rem;
+            line-height: 1.7;
+        }
+        .resume-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .resume-badge span {
+            background: rgba(26,188,156,.1);
+            color: #0f617d;
+            border-radius: 999px;
+            padding: 0.55rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .resume-heading {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .resume-heading .small-text {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+        a.resume-link {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+        a.resume-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="Home.html">Andrew Hancock</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="Home.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="Hobby.html">Lifestyle</a></li>
+                    <li class="nav-item"><a class="nav-link" href="game.html">Game</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="Resume.html">Resume</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="resume-hero">
+        <img src="Images/Mountain.png" alt="Resume header image">
+        <div class="hero-overlay">
+            <p class="text-uppercase mb-3" style="letter-spacing:.35em; opacity:.8;">Resume</p>
+            <h1>Andrew S. Hancock</h1>
+            <p class="lead">Pre-Business student at Brigham Young University with marketing, project management, and analytical experience in racing, healthcare, and humanitarian programs.</p>
+            
+        </div>
+    </section>
+
+    <main class="container resume-section">
+        <div class="resume-card">
+            <h3>Experience</h3>
+
+            <div class="resume-heading">
+                <div>
+                    <strong>RED 7 MARKETING</strong><br>
+                   <i>PROJECT MANAGER</i> · Mountain Green, UT
+                </div>
+                <div class="small-text">Jan 2026 – Present</div>
+            </div>
+            <ul class="resume-list"style="padding-left: 20px;">
+                
+                <li>Led marketing projects and brand initiatives, ensuring consistent messaging and alignment with ENVE Motorsports positioning.</li>
+                <li>Managed design, development, and sourcing of soft goods, coordinating with vendors to meet quality, cost, and timeline goals.</li>
+            </ul>
+
+            <div class="resume-heading">
+                <div>
+                    <strong>ENVE MOTORSPORTS</strong><br>
+                    <i>Analyst & Co-Founder</i> · Palm Springs, CA
+                </div>
+                <div class="small-text">Feb 2025 – Present</div>
+            </div>
+            <ul class="resume-list"style="padding-left: 20px;">
+                <li>Monitored operations and finances for the amateur racing team.</li>
+                <li>Led problem solving and strategic planning for growth and future events, supporting a sponsored driver in IndyNXT and a driver in USF 2000.</li>
+            </ul>
+
+            <div class="resume-heading">
+                <div>
+                    <strong>STEWARD OF MY LIFE (On Campus Internship)</strong><br>
+                   <i>Project Manager</i> · Provo, UT
+                </div>
+                <div class="small-text">Sep 2025 – Dec 2025</div>
+            </div>
+            <ul class="resume-list"style="padding-left: 20px;">
+                <li>Led web development initiatives that elevated digital presence and refined visual branding.</li>
+                <li>Oversaw project and brand reach execution, driving a 528% increase in social media following and 949.4% increase in audience interactions for Q4 2025.</li>
+            </ul>
+
+            <div class="resume-heading">
+                <div>
+                    <strong>PACS</strong><br>
+                  <i>Intern</i> · Farmington, UT
+                </div>
+                <div class="small-text">Jul 2024 – Oct 2024</div>
+            </div>
+            <ul class="resume-list"style="padding-left: 20px;">
+                <li>Accurately input, updated, and maintained large volumes of data into databases and systems with a high level of precision and attention to detail.</li>
+            </ul>
+
+            <div class="resume-heading">
+                <div>
+                    <strong> ENVE COMPOSITES</strong><br>
+                   <i>Bicycle Technician</i> · Ogden, UT
+                </div>
+                <div class="small-text">Jul 2021 – Oct 2021</div>
+            </div>
+            <ul class="resume-list"style="padding-left: 20px;">
+                <li>Calibrated 100 premium bicycle wheelsets, focusing on quality, performance, and structural integrity.</li>
+            </ul>
+        </div>
+
+        <div class="resume-card">
+            <h3>Education</h3>
+            <div class="resume-heading">
+                <div>
+                    <strong>Brigham Young University</strong><br>
+                    Pre-Business
+                </div>
+                <div class="small-text">Provo, UT · Expected April 2028</div>
+            </div>
+            <ul class="resume-list">
+                <li>GPA: 3.37 / 4.00</li>
+                <li>ACT: 32 / 36, 96th percentile</li>
+                <li>Member of BYU Real Estate Association and Finance Association</li>
+            </ul>
+        </div>
+
+        <div class="resume-card">
+            <h3>Leadership & Service</h3>
+            <div class="resume-heading">
+                <div>
+                    <strong>Project Leader</strong><br>
+                    RIZIKI FOUNDATION · Nairobi, Kenya
+                </div>
+                <div class="small-text">Jul 2024 – Aug 2025</div>
+            </div>
+            <ul class="resume-list"style="padding-left: 20px;">
+                <li>Financed, managed, and introduced humanitarian projects to improve local welfare.</li>
+                <li>Led a group through cultural immersion and service efforts to support community wellbeing.</li>
+            </ul>
+
+            <div class="resume-heading">
+                <div>
+                    <strong>Volunteer Representative</strong><br>
+                    The Church of Jesus Christ of Latter-day Saints · Olongapo, Philippines
+                </div>
+                <div class="small-text">Aug 2022 – Jul 2024</div>
+            </div>
+            <ul class="resume-list">
+                <li>Organized community outreach efforts, providing guidance, education, and support to individuals and families across diverse cultural settings.</li>
+            </ul>
+        </div>
+
+        <div class="resume-card">
+            <h3>Awards, Skills & Interests</h3>
+            <div class="resume-badge">
+                <span>Eagle Scout</span>
+                <span>Tagalog / Filipino (Bilingual)</span>
+                <span>Private Pilot</span>
+                <span>Amateur Racecar Driver</span>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white text-center py-4">
+        <p class="mb-0">&copy; 2026 Andrew Hancock</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haunted Forest Adventure</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at top, #1b2735 0%, #090a0f 60%);
+            color: #f0f0f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 980px;
+            height: 100%;
+            max-height: 100%;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .title h1 {
+            font-size: 3rem;
+            letter-spacing: 1px;
+            color: #a6fffa;
+            text-shadow: 0 0 16px rgba(166, 255, 250, 0.4);
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: 3fr 1.5fr;
+            gap: 18px;
+            align-items: stretch;
+            height: calc(100% - 90px);
+        }
+
+        .scene,
+        .panel {
+            background: rgba(15, 18, 32, 0.92);
+            border: 1px solid rgba(166, 255, 250, 0.15);
+            border-radius: 18px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+        }
+
+        .scene {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .scene-header {
+            background: linear-gradient(135deg, rgba(166,255,250,0.16), rgba(0,0,0,0.1));
+            padding: 18px;
+        }
+
+        .scene-header h2 {
+            margin-bottom: 6px;
+            color: #84ffff;
+        }
+
+        .scene-header p {
+            line-height: 1.5;
+            color: #cde8ff;
+        }
+
+        .visual {
+            background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1), transparent 40%),
+                        linear-gradient(180deg, rgba(20, 34, 58, 0.98), rgba(6, 8, 12, 0.9));
+            flex: 0 0 140px;
+            position: relative;
+            padding: 12px;
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 2rem;
+            text-shadow: 0 0 12px rgba(0, 0, 0, 0.75);
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+        }
+
+        .visual::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"%3E%3Cpath fill="none" stroke="rgba(166,255,250,0.08)" stroke-width="1" d="M0 200c100-80 200 80 400 0"/%3E%3C/svg%3E') center/contain no-repeat;
+            opacity: 0.25;
+        }
+
+        .visual-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            line-height: 1.2;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .description {
+            padding: 12px;
+            line-height: 1.5;
+            font-size: 0.9rem;
+            flex: 0 0 auto;
+            max-height: 70px;
+            overflow-y: auto;
+        }
+
+        .actions {
+            display: grid;
+            gap: 10px;
+            padding: 12px;
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        .action-button,
+        .menu-button,
+        .replay-button {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid rgba(166,255,250,0.25);
+            border-radius: 12px;
+            background: rgba(13, 15, 20, 0.88);
+            color: #a9ffff;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+            text-align: left;
+        }
+
+        .action-button:hover,
+        .menu-button:hover,
+        .replay-button:hover {
+            transform: translateY(-1px);
+            background: rgba(24, 39, 62, 0.98);
+            box-shadow: 0 0 20px rgba(166, 255, 250, 0.2);
+        }
+
+        .action-button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .panel {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            height: 100%;
+        }
+
+        .status,
+        .log,
+        .inventory {
+            padding: 18px;
+            overflow: auto;
+        }
+
+        .status h3,
+        .log h3,
+        .inventory h3 {
+            margin-bottom: 12px;
+            color: #8ff7ff;
+        }
+
+        .status-list,
+        .inventory-list,
+        .log-list {
+            list-style: none;
+            display: grid;
+            gap: 10px;
+        }
+
+        .status-list li,
+        .inventory-list li,
+        .log-list li {
+            padding: 14px;
+            border: 1px solid rgba(166,255,250,0.12);
+            border-radius: 12px;
+            background: rgba(7, 10, 16, 0.72);
+            line-height: 1.4;
+            font-size: 0.95rem;
+        }
+
+        .panel-footer {
+            padding: 18px;
+            border-top: 1px solid rgba(166,255,250,0.12);
+            background: rgba(4, 6, 11, 0.9);
+            font-size: 0.95rem;
+            color: #b2e9ff;
+        }
+
+        .menu {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 18px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .menu h1 {
+            font-size: 3.5rem;
+            color: #92f0ff;
+            text-shadow: 0 0 25px rgba(146, 240, 255, 0.35);
+        }
+
+        .menu p {
+            max-width: 640px;
+            color: #d7f7ff;
+            line-height: 1.6;
+        }
+
+        .menu-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .difficulty-btn,
+        .replay-button {
+            padding: 16px 30px;
+            border: 2px solid rgba(166,255,250,0.35);
+            border-radius: 14px;
+            background: rgba(12, 18, 31, 0.96);
+            color: #c5ffff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .difficulty-btn:hover,
+        .replay-button:hover {
+            transform: translateY(-2px);
+            background: rgba(26, 58, 87, 0.96);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .screen-forest {
+            background: linear-gradient(180deg, rgba(22, 35, 58, 0.95), rgba(5, 8, 16, 1));
+        }
+
+        .screen-path {
+            background: linear-gradient(180deg, rgba(30, 44, 70, 0.95), rgba(8, 11, 18, 1));
+        }
+
+        .screen-boss {
+            background: linear-gradient(180deg, rgba(75, 12, 14, 0.95), rgba(16, 7, 12, 1));
+        }
+
+        .screen-combat {
+            background: linear-gradient(180deg, rgba(52, 12, 67, 0.95), rgba(8, 5, 17, 1));
+        }
+
+        .log-list {
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .log-list li span {
+            color: #a3f7bc;
+            font-weight: 700;
+        }
+
+        @media (max-width: 950px) {
+            .game-board {
+                grid-template-columns: 1fr;
+            }
+            .panel {
+                margin-top: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="Home.html">Andrew Hancock</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="Home.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="Hobby.html">Lifestyle</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="game.html">Game</a></li>
+                    <li class="nav-item"><a class="nav-link" href="Resume.html">Resume</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="title">
+            <h1>Haunted Forest Adventure</h1>
+        </div>
+
+        <div class="game-board">
+            <div class="scene screen-forest" id="scene">
+                <div class="scene-header">
+                    <h2 id="scene-title">Welcome to the Forest</h2>
+                    <p id="scene-description">A cold mist curls around the path. Strange shadows shift in the distance. Your goal: reach the Tree Dungeon and defeat the corrupted guardian.</p>
+                </div>
+                <div class="visual" id="visual">
+                    <div class="visual-content" id="visual-content">🌲</div>
+                </div>
+                <div class="description" id="scene-text">Your adventure begins at the edge of the haunted forest.</div>
+                <div class="actions" id="action-buttons"></div>
+            </div>
+
+            <div class="panel">
+                <div class="status">
+                    <h3>Adventurer</h3>
+                    <ul class="status-list" id="status-list"></ul>
+                </div>
+                <div class="inventory">
+                    <h3>Inventory</h3>
+                    <ul class="inventory-list" id="inventory-list"></ul>
+                </div>
+                <div class="log">
+                    <h3>Journal</h3>
+                    <ul class="log-list" id="log-list"></ul>
+                </div>
+                <div class="panel-footer" id="panel-footer">Choose your path and collect gear to survive the forest.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="menu" class="menu">
+        <h1>Haunted Forest Adventure</h1>
+        <p>Enter a corrupt forest full of relics, monsters, and roguelike danger. Gather swords, armor, potions, and choose your path carefully. The final challenge waits at the tree dungeon.</p>
+        <div class="menu-buttons">
+            <button class="replay-button" onclick="startAdventure()">Begin Adventure</button>
+        </div>
+    </div>
+
+    <div id="winScreen" class="menu hidden">
+        <h1>VICTORY</h1>
+        <p id="win-text"></p>
+        <button class="replay-button" onclick="restartGame()">Play Again</button>
+    </div>
+
+    <div id="loseScreen" class="menu hidden">
+        <h1>DEFEAT</h1>
+        <p id="lose-text"></p>
+        <button class="replay-button" onclick="restartGame()">Try Again</button>
+    </div>
+
+    <script>
+        const sceneTitle = document.getElementById('scene-title');
+        const sceneDesc = document.getElementById('scene-description');
+        const sceneText = document.getElementById('scene-text');
+        const visualContent = document.getElementById('visual-content');
+        const scene = document.getElementById('scene');
+        const actionButtons = document.getElementById('action-buttons');
+        const statusList = document.getElementById('status-list');
+        const inventoryList = document.getElementById('inventory-list');
+        const logList = document.getElementById('log-list');
+        const panelFooter = document.getElementById('panel-footer');
+        const menu = document.getElementById('menu');
+        const winScreen = document.getElementById('winScreen');
+        const loseScreen = document.getElementById('loseScreen');
+        const winText = document.getElementById('win-text');
+        const loseText = document.getElementById('lose-text');
+
+        let gameState = 'menu';
+        let difficulty = 'normal';
+        let turnCount = 0;
+        let score = 0;
+        let stageProgress = 0;
+        let playerX = 0;
+        let playerY = 0;
+        let investigationsLeft = 0;
+        const progressThresholds = [2, 3, Infinity];
+
+        const player = {
+            name: 'Warden',
+            health: 35,
+            maxHealth: 35,
+            attack: 6,
+            defense: 2,
+            gold: 0,
+            potionCount: 2,
+            weapon: { name: 'Rusty Sword', attack: 2 },
+            armor: { name: 'Torn Cloak', defense: 1 },
+            relic: null,
+            inventory: []
+        };
+
+        const stages = [
+            { id: 'forest', title: 'Forest Edge', description: 'The haunted forest looms ahead. Fallen trees and glowing eyes watch you. Choose your first path.', icon: '🌲', style: 'screen-forest' },
+            { id: 'path', title: 'Twisted Trail', description: 'A narrow trail twists through rotten roots. You can search for gear, avoid danger, or push deeper.', icon: '🪓', style: 'screen-path' },
+            { id: 'dungeon', title: 'Tree Dungeon', description: 'An ancient tree dungeon pulses with corruption at its heart. A terrible boss waits beyond the root gate.', icon: '🌳', style: 'screen-boss' }
+        ];
+
+        const enemies = {
+            wandering: {
+                name: 'Wraith',
+                health: 18,
+                attack: 5,
+                defense: 1,
+                icon: '👻',
+                moves: [
+                    { name: 'Ethereal Clutch', damageModifier: 0, text: 'it reaches through your mind with chilling fingers.' },
+                    { name: 'Spectral Slash', damageModifier: 2, text: 'a blade of shadow slashes at you.' },
+                    { name: 'Haunting Wail', damageModifier: 1, text: 'a piercing cry rattles your bones.' }
+                ]
+            },
+            stalker: {
+                name: 'Corrupt Wolf',
+                health: 22,
+                attack: 6,
+                defense: 2,
+                icon: '🐺',
+                moves: [
+                    { name: 'Pouncing Dash', damageModifier: 1, text: 'it lunges with savage speed.' },
+                    { name: 'Savage Bite', damageModifier: 2, text: 'its teeth tear at your flesh.' },
+                    { name: 'Wolf Howl', damageModifier: 0, text: 'it howls and prepares a strike.' }
+                ]
+            },
+            guardian: {
+                name: 'Root Guardian',
+                health: 45,
+                attack: 9,
+                defense: 4,
+                icon: '🌿',
+                moves: [
+                    { name: 'Root Slam', damageModifier: 3, text: 'massive roots smash the earth.' },
+                    { name: 'Vine Lash', damageModifier: 2, text: 'vines whip around you.' },
+                    { name: 'Spore Burst', damageModifier: 1, text: 'toxic spores cloud the air.' }
+                ]
+            },
+            boss: {
+                name: 'Tree Lord',
+                health: 70,
+                attack: 12,
+                defense: 5,
+                icon: '🌳',
+                moves: [
+                    { name: 'Twisting Roots', damageModifier: 4, text: 'root tendrils crush your shield.' },
+                    { name: 'Corrupt Roar', damageModifier: 2, text: 'a terrifying roar shakes your resolve.' },
+                    { name: 'Nightmare Grasp', damageModifier: 3, text: 'corruption claws at your soul.' },
+                    { name: 'Life Drain', damageModifier: 0, effect: 'heal', text: 'it draws energy back into its roots.' }
+                ]
+            }
+        };
+
+        const lootItems = [
+            { type: 'weapon', name: 'Iron Sword', attack: 4, rarity: 'common' },
+            { type: 'weapon', name: 'Silver Blade', attack: 6, rarity: 'rare' },
+            { type: 'armor', name: 'Leather Vest', defense: 3, rarity: 'common' },
+            { type: 'armor', name: 'Enchanted Guard', defense: 5, rarity: 'rare' },
+            { type: 'potion', name: 'Healing Potion', heal: 14, rarity: 'common' },
+            { type: 'relic', name: 'Forest Charm', effect: 'Gain +1 attack each stage', rarity: 'rare' }
+        ];
+
+        const difficultyModifiers = {
+            easy: { healthBonus: 10, enemyScale: 0.85, startPotions: 4, relicChance: 0.2 },
+            normal: { healthBonus: 0, enemyScale: 1, startPotions: 3, relicChance: 0.15 },
+            hard: { healthBonus: -5, enemyScale: 1.2, startPotions: 2, relicChance: 0.1 }
+        };
+
+        function startAdventure() {
+            difficulty = 'normal';
+            gameState = 'playing';
+            turnCount = 0;
+            score = 0;
+            menu.classList.add('hidden');
+            winScreen.classList.add('hidden');
+            loseScreen.classList.add('hidden');
+            resetPlayer();
+            log('A new adventure begins...');
+            setStage(0);
+            render();
+        }
+
+        function resetPlayer() {
+            const diff = difficultyModifiers[difficulty];
+            player.health = 35 + diff.healthBonus;
+            player.maxHealth = player.health;
+            player.attack = 6;
+            player.defense = 2;
+            player.gold = 0;
+            player.potionCount = diff.startPotions;
+            player.weapon = { name: 'Rusty Sword', attack: 2 };
+            player.armor = { name: 'Torn Cloak', defense: 1 };
+            player.relic = null;
+            player.inventory = [];
+            if (Math.random() < diff.relicChance) {
+                player.relic = { name: 'Warden Sigil', effect: 'Gain +1 attack each time you find a relic.' };
+            }
+        }
+
+        let currentStage = 0;
+        let currentEncounter = null;
+
+        function setStage(index) {
+            currentStage = index;
+            stageProgress = 0;
+            playerX = 0;
+            playerY = 0;
+            investigationsLeft = 2;
+            const stage = stages[index];
+            sceneTitle.textContent = stage.title;
+            sceneDesc.textContent = stage.description;
+            updateVisualForStage(index);
+            scene.className = `scene ${stage.style}`;
+            sceneText.textContent = '';
+            currentEncounter = null;
+            renderActions();
+            updatePanel('You step into the next zone of the haunted forest.');
+        }
+
+        function updateVisualForStage(stageIndex) {
+            if (stageIndex === 0) {
+                const left = playerX === -1 ? '@' : '·';
+                const center = playerX === 0 ? '@' : '·';
+                const right = playerX === 1 ? '@' : '·';
+                visualContent.textContent = `  ${left}  ${center}  ${right}\n  |  |  |\n  +--+--+\n     |`;
+            } else if (stageIndex === 1) {
+                const top = playerX === 0 ? '@' : '·';
+                const left = playerX === -1 ? '@' : '·';
+                const mid = playerX === 0 ? '@' : '·';
+                const right = playerX === 1 ? '@' : '·';
+                const bottom = playerX === 0 && playerY === 1 ? '@' : '·';
+                visualContent.textContent = `   ${top}\n   |\n ${left}-+-${right}\n   |\n   ${bottom}`;
+            } else {
+                visualContent.textContent = '  [TREE]\n ═══════\n DUNGEON';
+            }
+        }
+
+        function renderActions() {
+            actionButtons.innerHTML = '';
+            if (gameState !== 'playing') return;
+
+            if (currentEncounter && currentEncounter.type === 'combat') {
+                renderCombatActions();
+                return;
+            }
+
+            if (currentStage === stages.length - 1 && !currentEncounter) {
+                renderDungeonActions();
+            } else {
+                renderExplorationActions();
+            }
+        }
+
+        function renderExplorationActions() {
+            addAction('Move Deeper', 'Push toward the dungeon.', exploreDeeper);
+            addAction('Left Path', `Investigate left route (${investigationsLeft} left).`, () => investigateRoute(-1), investigationsLeft <= 0);
+            addAction('Forward Path', `Investigate forward route (${investigationsLeft} left).`, () => investigateRoute(0), investigationsLeft <= 0);
+            addAction('Right Path', `Investigate right route (${investigationsLeft} left).`, () => investigateRoute(1), investigationsLeft <= 0);
+            addAction('Use Potion', `Heal up (${player.potionCount} left).`, usePotion, player.potionCount <= 0);
+            addAction('Review Inventory', 'View your equipment and relics.', showInventory);
+        }
+
+        function renderDungeonActions() {
+            addAction('Enter Tree Dungeon', 'Face the corrupted guardian.', beginBossBattle);
+            addAction('Scavenge', `Search for supplies (${investigationsLeft} left).`, investigateRoute, investigationsLeft <= 0);
+            addAction('Use Potion', `Heal up (${player.potionCount} left).`, usePotion, player.potionCount <= 0);
+            addAction('Review Inventory', 'View your equipment and relics.', showInventory);
+        }
+
+        function renderCombatActions() {
+            addAction('Attack', 'Basic strike.', () => playerAttack('attack'));
+            addAction('Heavy Strike', 'Powerful blow with risk.', () => playerAttack('strong'));
+            addAction('Agile Jab', 'Quick hit and offset the enemy balance.', () => playerAttack('quick'));
+            addAction('Defend', 'Brace for the next attack.', playerDefend);
+            addAction('Use Potion', `Heal up (${player.potionCount} left).`, usePotion, player.potionCount <= 0);
+            if (currentEncounter.enemy.name !== 'Tree Lord') {
+                addAction('Flee', 'Try to escape the enemy.', attemptEscape);
+            }
+        }
+
+        function addAction(label, subtitle, callback, disabled = false) {
+            const button = document.createElement('button');
+            button.className = 'action-button';
+            button.disabled = disabled;
+            button.innerHTML = `<strong>${label}</strong><br><small>${subtitle}</small>`;
+            button.onclick = callback;
+            actionButtons.appendChild(button);
+        }
+
+        function exploreDeeper() {
+            turnCount += 1;
+            stageProgress += 1;
+            if (Math.random() < 0.65) {
+                startEncounter(randomEnemy());
+                return;
+            }
+
+            if (stageProgress >= progressThresholds[currentStage] && currentStage < stages.length - 1) {
+                updatePanel('You push onward and discover a new section of the forest.');
+                setStage(currentStage + 1);
+                return;
+            }
+
+            const reward = findLoot();
+            updatePanel(reward);
+            renderActions();
+        }
+
+        function investigateRoute(direction) {
+            if (investigationsLeft <= 0) return;
+            investigationsLeft -= 1;
+            turnCount += 1;
+            playerX = direction;
+            updateVisualForStage(currentStage);
+            
+            if (Math.random() < 0.5) {
+                startEncounter(randomEnemy());
+            } else {
+                const reward = findLoot(true);
+                updatePanel(`Following the path... ${reward}`);
+                renderActions();
+            }
+        }
+
+        function showInventory() {
+            updatePanel('You open your pack and inspect your weapons, armor, and relics.');
+        }
+
+        function randomEnemy() {
+            if (currentStage === stages.length - 1) {
+                return cloneEnemy(enemies.boss);
+            }
+            const roll = Math.random();
+            if (roll < 0.5) return cloneEnemy(enemies.wandering);
+            return cloneEnemy(enemies.stalker);
+        }
+
+        function cloneEnemy(template) {
+            const scale = difficultyModifiers[difficulty].enemyScale;
+            const baseHealth = Math.ceil(template.health * scale + currentStage * 4);
+            return {
+                ...template,
+                health: baseHealth,
+                maxHealth: baseHealth,
+                attack: Math.max(1, Math.ceil(template.attack * scale + currentStage * 1)),
+                defense: Math.max(0, Math.ceil(template.defense * scale))
+            };
+        }
+
+        function findLoot(better = false) {
+            const items = better ? lootItems : lootItems.filter(i => i.rarity !== 'rare' || Math.random() > 0.75);
+            const item = items[Math.floor(Math.random() * items.length)];
+            if (item.type === 'potion') {
+                player.potionCount += 1;
+                log(`Found a ${item.name}.`);
+                return `A ${item.name} was discovered. Potions +1.`;
+            }
+            if (item.type === 'weapon') {
+                player.inventory.push(item);
+                equipBetterWeapon(item);
+                log(`Acquired ${item.name}.`);
+                return `You found ${item.name}. Attack +${item.attack}.`;
+            }
+            if (item.type === 'armor') {
+                player.inventory.push(item);
+                equipBetterArmor(item);
+                log(`Acquired ${item.name}.`);
+                return `You found ${item.name}. Defense +${item.defense}.`;
+            }
+            if (item.type === 'relic' && !player.relic) {
+                player.relic = item;
+                log(`Discovered relic: ${item.name}.`);
+                return `You found ${item.name}. ${item.effect}`;
+            }
+            player.potionCount += 1;
+            log('Found a spare potion.');
+            return 'You found an extra potion while searching.';
+        }
+
+        function equipBetterWeapon(item) {
+            if (item.attack > player.weapon.attack) {
+                player.weapon = item;
+                log(`Equipped ${item.name}.`);
+            }
+        }
+
+        function equipBetterArmor(item) {
+            if (item.defense > player.armor.defense) {
+                player.armor = item;
+                log(`Equipped ${item.name}.`);
+            }
+        }
+
+        function startEncounter(enemy) {
+            currentEncounter = {
+                type: 'combat',
+                enemy,
+                defendActive: false,
+                defendAmount: 0,
+                weakenEnemy: 0
+            };
+            sceneText.textContent = `A ${enemy.name} appears!`;
+            scene.className = 'scene screen-combat';
+            updateCombatVisual(enemy);
+            log(`Encountered ${enemy.name}.`);
+            renderActions();
+        }
+
+        function updateCombatVisual(enemy) {
+            const visuals = {
+                'Wraith': '  ~~~~\n ~~~~~\n  ~~~~',
+                'Corrupt Wolf': '  <~>\n  /M\\\n  / \\',
+                'Root Guardian': '  |||\n /|||\\\n (   )',
+                'Tree Lord': '   @\n  <|>\n   |'
+            };
+            visualContent.textContent = visuals[enemy.name] || enemy.icon;
+        }
+
+        function playerAttack(style) {
+            const baseAttack = player.attack + player.weapon.attack + (player.relic ? 1 : 0);
+            let damage = 0;
+            let description = '';
+
+            if (style === 'strong') {
+                if (Math.random() < 0.25) {
+                    log('Your heavy strike misses as the enemy dodges!');
+                    enemyTurn();
+                    return;
+                }
+                damage = Math.max(1, Math.round(baseAttack * 1.5) - currentEncounter.enemy.defense);
+                description = `You unleash a heavy strike for ${damage} damage.`;
+            } else if (style === 'quick') {
+                damage = Math.max(1, Math.round(baseAttack * 0.85) - currentEncounter.enemy.defense);
+                currentEncounter.weakenEnemy = 1;
+                description = `You jab quickly for ${damage} damage and leave the enemy off balance.`;
+            } else {
+                damage = Math.max(1, baseAttack - currentEncounter.enemy.defense);
+                description = `You attack for ${damage} damage.`;
+            }
+
+            currentEncounter.enemy.health -= damage;
+            log(description);
+
+            if (currentEncounter.enemy.health <= 0) {
+                winEncounter();
+                return;
+            }
+            enemyTurn();
+        }
+
+        function playerDefend() {
+            currentEncounter.defendActive = true;
+            currentEncounter.defendAmount = player.defense + player.armor.defense + 2;
+            log('You brace for the next attack.');
+            enemyTurn();
+        }
+
+        function usePotion() {
+            if (player.potionCount <= 0) return;
+            const heal = Math.min(player.maxHealth - player.health, 15);
+            player.health += heal;
+            player.potionCount -= 1;
+            log(`Drink potion and recover ${heal} health.`);
+            if (currentEncounter && currentEncounter.type === 'combat') {
+                enemyTurn();
+            }
+            render();
+        }
+
+        function attemptEscape() {
+            if (Math.random() < 0.45) {
+                log('You escaped the fight.');
+                currentEncounter = null;
+                scene.className = `scene ${stages[currentStage].style}`;
+                visualContent.textContent = stages[currentStage].icon;
+                sceneText.textContent = 'You slip back into the forest path unscathed.';
+                renderActions();
+            } else {
+                log('Failed to escape!');
+                enemyTurn();
+            }
+        }
+
+        function enemyTurn() {
+            const enemy = currentEncounter.enemy;
+            const move = enemy.moves[Math.floor(Math.random() * enemy.moves.length)];
+            let damage = Math.max(0, enemy.attack + (move.damageModifier || 0) - player.armor.defense - player.defense);
+
+            if (currentEncounter.weakenEnemy > 0) {
+                damage = Math.max(0, damage - currentEncounter.weakenEnemy);
+                currentEncounter.weakenEnemy = 0;
+            }
+
+            if (currentEncounter.defendActive) {
+                damage = Math.max(0, damage - currentEncounter.defendAmount);
+                currentEncounter.defendActive = false;
+                currentEncounter.defendAmount = 0;
+            }
+
+            if (move.effect === 'heal') {
+                const healAmount = 8;
+                enemy.health = Math.min(enemy.maxHealth, enemy.health + healAmount);
+                log(`${enemy.name} uses ${move.name} and restores ${healAmount} health.`);
+                damage = 0;
+            }
+
+            if (damage === 0) {
+                log(`${enemy.name} uses ${move.name} and ${move.text} The attack deals no damage.`);
+            } else {
+                player.health -= damage;
+                log(`${enemy.name} uses ${move.name} and ${move.text} It deals ${damage} damage.`);
+            }
+
+            if (player.health <= 0) {
+                endGame(false);
+            } else {
+                render();
+            }
+        }
+
+        function winEncounter() {
+            const enemy = currentEncounter.enemy;
+            const gold = 10 + Math.floor(Math.random() * 8);
+            player.gold += gold;
+            score += 25;
+            log(`Defeated ${enemy.name}. Gained ${gold} gold.`);
+            sceneText.textContent = `You defeated ${enemy.name}. You earned ${gold} gold.`;
+            currentEncounter = null;
+            scene.className = `scene ${stages[currentStage].style}`;
+            visualContent.textContent = stages[currentStage].icon;
+            if (Math.random() < 0.4) {
+                const loot = findLoot();
+                sceneText.textContent += ` ${loot}`;
+            }
+            if (currentStage < stages.length - 1 && Math.random() < 0.25) {
+                player.potionCount += 1;
+                log('Found a potion on the corpse.');
+                sceneText.textContent += ' You picked up a potion.';
+            }
+            render();
+            renderActions();
+        }
+
+        function beginBossBattle() {
+            startEncounter(cloneEnemy(enemies.boss));
+            sceneText.textContent = 'The Tree Lord rises from the roots and charges!';
+            scene.className = 'scene screen-boss';
+            visualContent.textContent = '🌳';
+        }
+
+        function updatePanel(message) {
+            sceneText.textContent = message;
+            log(message);
+            render();
+        }
+
+        function render() {
+            statusList.innerHTML = '';
+            const totalAttack = player.attack + player.weapon.attack + (player.relic ? 1 : 0);
+            const totalDefense = player.defense + player.armor.defense;
+            const statusItems = [
+                `Health: ${player.health}/${player.maxHealth}`,
+                `Attack: ${totalAttack} (${player.weapon.name})`,
+                `Defense: ${totalDefense} (${player.armor.name})`,
+                `Potions: ${player.potionCount}`,
+                `Gold: ${player.gold}`,
+                `Score: ${score}`,
+                `Relic: ${player.relic ? player.relic.name : 'None'}`
+            ];
+            statusItems.forEach(addStatus);
+
+            inventoryList.innerHTML = '';
+            addInventory(`Weapon: ${player.weapon.name}`);
+            addInventory(`Armor: ${player.armor.name}`);
+            addInventory(`Potions: ${player.potionCount}`);
+            if (player.relic) addInventory(`Relic: ${player.relic.name}`);
+            player.inventory.filter(i => i.type !== 'potion').forEach(item => addInventory(`${item.name} (${item.type})`));
+
+            panelFooter.textContent = currentEncounter && currentEncounter.type === 'combat'
+                ? `${currentEncounter.enemy.name} HP: ${currentEncounter.enemy.health}/${currentEncounter.enemy.maxHealth}`
+                : !currentEncounter && currentStage < 2
+                ? `Location: [${playerX}] • Explorations left: ${investigationsLeft}`
+                : `Stage ${currentStage + 1} of ${stages.length}`;
+            renderActions();
+        }
+
+        function addStatus(text) {
+            const li = document.createElement('li');
+            li.textContent = text;
+            statusList.appendChild(li);
+        }
+
+        function addInventory(text) {
+            const li = document.createElement('li');
+            li.textContent = text;
+            inventoryList.appendChild(li);
+        }
+
+        function log(text) {
+            const li = document.createElement('li');
+            li.innerHTML = `<span>»</span> ${text}`;
+            logList.prepend(li);
+            if (logList.childElementCount > 8) logList.removeChild(logList.lastChild);
+        }
+
+        function endGame(won) {
+            gameState = won ? 'win' : 'lose';
+            if (won) {
+                winText.textContent = `You cleansed the forest and defeated the Tree Lord in ${turnCount} moves. Final gold: ${player.gold}.`;
+                winScreen.classList.remove('hidden');
+            } else {
+                loseText.textContent = `You were consumed by the forest. You lasted ${turnCount} turns.`;
+                loseScreen.classList.remove('hidden');
+            }
+        }
+
+        function restartGame() {
+            menu.classList.remove('hidden');
+            winScreen.classList.add('hidden');
+            loseScreen.classList.add('hidden');
+            gameState = 'menu';
+            sceneText.textContent = 'Your adventure resets. Enter again to begin once more.';
+            currentEncounter = null;
+            render();
+        }
+
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Enter' && gameState === 'menu') {
+                startAdventure();
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
