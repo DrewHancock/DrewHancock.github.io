@@ -88,7 +88,8 @@
         .visual {
             background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1), transparent 40%),
                         linear-gradient(180deg, rgba(20, 34, 58, 0.98), rgba(6, 8, 12, 0.9));
-            flex: 0 0 140px;
+            flex: 0 0 220px;
+            min-height: 220px;
             position: relative;
             padding: 12px;
             color: #fff;
@@ -112,9 +113,57 @@
             position: relative;
             z-index: 2;
             text-align: center;
-            line-height: 1.2;
-            white-space: pre-wrap;
+            line-height: 1.25;
+            white-space: normal;
             word-wrap: break-word;
+            font-size: 1.8rem;
+            letter-spacing: 0.04em;
+            min-height: 3rem;
+        }
+
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 16px;
+        }
+
+        .map-cell {
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 10px;
+            font-size: 1.05rem;
+            color: #eaf5ff;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.15);
+        }
+
+        .map-cell.active {
+            background: rgba(33, 163, 249, 0.18);
+            border-color: rgba(33, 163, 249, 0.4);
+            box-shadow: 0 0 18px rgba(33, 163, 249, 0.18);
+        }
+
+        .map-cell.enemy {
+            background: rgba(255, 90, 123, 0.18);
+            border-color: rgba(255, 90, 123, 0.35);
+        }
+
+        .map-cell.path {
+            background: rgba(119, 97, 217, 0.18);
+        }
+
+        .map-label {
+            margin-top: 12px;
+            font-size: 0.95rem;
+            color: #b7e7ff;
+            opacity: 0.9;
         }
 
         .description {
@@ -331,6 +380,8 @@
                 </div>
                 <div class="visual" id="visual">
                     <div class="visual-content" id="visual-content">🌲</div>
+                    <div class="map-grid" id="map-grid"></div>
+                    <div class="map-label" id="map-label">Forest path</div>
                 </div>
                 <div class="description" id="scene-text">Your adventure begins at the edge of the haunted forest.</div>
                 <div class="actions" id="action-buttons"></div>
@@ -379,6 +430,8 @@
         const sceneDesc = document.getElementById('scene-description');
         const sceneText = document.getElementById('scene-text');
         const visualContent = document.getElementById('visual-content');
+        const mapGrid = document.getElementById('map-grid');
+        const mapLabel = document.getElementById('map-label');
         const scene = document.getElementById('scene');
         const actionButtons = document.getElementById('action-buttons');
         const statusList = document.getElementById('status-list');
@@ -535,26 +588,40 @@
             scene.className = `scene ${stage.style}`;
             sceneText.textContent = '';
             currentEncounter = null;
+            mapGrid.classList.remove('hidden');
             renderActions();
             updatePanel('You step into the next zone of the haunted forest.');
         }
 
         function updateVisualForStage(stageIndex) {
+            mapGrid.classList.remove('hidden');
+            const stage = stages[stageIndex];
+            visualContent.textContent = stage.icon;
+            mapLabel.textContent = stage.title;
+            const cells = [];
+            const isBossStage = stageIndex === stages.length - 1;
+
             if (stageIndex === 0) {
-                const left = playerX === -1 ? '@' : '·';
-                const center = playerX === 0 ? '@' : '·';
-                const right = playerX === 1 ? '@' : '·';
-                visualContent.textContent = `  ${left}  ${center}  ${right}\n  |  |  |\n  +--+--+\n     |`;
+                const labels = ['Left', 'Center', 'Right'];
+                for (let i = 0; i < 3; i++) {
+                    const active = i - 1 === playerX;
+                    cells.push({ text: labels[i], active, type: active ? 'active' : 'path' });
+                }
             } else if (stageIndex === 1) {
-                const top = playerX === 0 ? '@' : '·';
-                const left = playerX === -1 ? '@' : '·';
-                const mid = playerX === 0 ? '@' : '·';
-                const right = playerX === 1 ? '@' : '·';
-                const bottom = playerX === 0 && playerY === 1 ? '@' : '·';
-                visualContent.textContent = `   ${top}\n   |\n ${left}-+-${right}\n   |\n   ${bottom}`;
+                const labels = ['Ravine', 'Trail', 'Climb'];
+                for (let i = 0; i < 3; i++) {
+                    const active = i - 1 === playerX;
+                    cells.push({ text: labels[i], active, type: active ? 'active' : 'path' });
+                }
             } else {
-                visualContent.textContent = '  [TREE]\n ═══════\n DUNGEON';
+                cells.push({ text: 'Dungeon Gate', active: true, type: 'active' });
+                cells.push({ text: 'Tree Heart', active: false, type: 'enemy' });
+                cells.push({ text: 'Boss Room', active: false, type: 'enemy' });
             }
+
+            mapGrid.innerHTML = cells.map(cell => `
+                <div class="map-cell ${cell.type}${cell.active ? ' active' : ''}">${cell.text}</div>
+            `).join('');
         }
 
         function renderActions() {
@@ -723,6 +790,8 @@
             };
             sceneText.textContent = `A ${enemy.name} appears!`;
             scene.className = 'scene screen-combat';
+            mapGrid.classList.add('hidden');
+            mapLabel.textContent = `${enemy.name} Encounter`;
             updateCombatVisual(enemy);
             log(`Encountered ${enemy.name}.`);
             renderActions();
@@ -730,12 +799,13 @@
 
         function updateCombatVisual(enemy) {
             const visuals = {
-                'Wraith': '  ~~~~\n ~~~~~\n  ~~~~',
-                'Corrupt Wolf': '  <~>\n  /M\\\n  / \\',
-                'Root Guardian': '  |||\n /|||\\\n (   )',
-                'Tree Lord': '   @\n  <|>\n   |'
+                'Wraith': '👻',
+                'Corrupt Wolf': '🐺',
+                'Root Guardian': '🌿',
+                'Tree Lord': '🌳'
             };
             visualContent.textContent = visuals[enemy.name] || enemy.icon;
+            mapLabel.textContent = `${enemy.name}`;
         }
 
         function playerAttack(style) {
